@@ -33,20 +33,18 @@ def main():
     producer = Producer(conf)
 
     rdr = csv.reader(open(args.filename))
-    next(rdr)  # Skip header
+    next(rdr)  
     firstline = True
-    previous_timestamp = None  # Initialize previous_timestamp variable
+    previous_timestamp = None  
 
     while True:
         try:
             line = next(rdr, None)
-            if line is None:  # If there are no more lines
+            if line is None: 
                 break
-
-            # Convert timestamp to UNIX format
+            # UNIX format
             timestamp_unix = int(parse(line[0]).timestamp() * 1000)
 
-            # The rest of your line processing code...
             x1, y1, nn_pred_xr, nn_pred_yr, svr_pred_xr, svr_pred_yr, zero = float(line[1]), float(line[2]), float(line[3]), float(line[4]), float(line[5]), float(line[6]), int(line[7])
             
             result = {
@@ -62,21 +60,19 @@ def main():
 
             jresult = json.dumps(result)
 
-            # For the first line, there's no need to wait; for subsequent lines, calculate the wait time based on the timestamp difference
             if not firstline:
-                # Now using UNIX timestamp, need to convert previous_timestamp back to a datetime for comparison
                 d1 = previous_timestamp_unix
                 d2 = timestamp_unix
                 diff = (d2 - d1) / args.speed
                 time.sleep(diff)
 
-            previous_timestamp_unix = timestamp_unix  # Update previous_timestamp for the next iteration
+            previous_timestamp_unix = timestamp_unix  
             firstline = False
 
             producer.produce(topic, key=p_key, value=jresult, callback=acked)
             producer.flush()
 
-        except StopIteration:  # Catch the StopIteration if next(rdr) returns None
+        except StopIteration:  
             break
         except Exception as e:
             print(f"An error occurred: {e}")
