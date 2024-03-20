@@ -1,6 +1,3 @@
-"""Consumes stream for printing all messages to the console.
-"""
-
 import argparse
 import json
 import sys
